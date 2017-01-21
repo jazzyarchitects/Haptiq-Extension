@@ -1,6 +1,7 @@
 "use strict";
 
 let isPaired = false;
+let __chrome_unique_id = undefined;
 
 const allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980!@#$%^&*()_+-={}[]<>|";
 
@@ -12,15 +13,17 @@ function randomString(length){
   return result;
 }
 
-let timeout = undefined;
 
 function change(){
   if(isPaired){
-    let elements = document.getElementsByClassName("notPaired");
-    for(let i=0;i<elements.length;i++){
-      elements[i].remove();
-    }
+    removeClassElements("notPaired");
     return;
+  }else{
+    removeClassElements("paired");
+  }
+
+  if(__chrome_unique_id===undefined){
+    setTimeout(change, 0.5*1000);
   }
 
   let code = randomString(32);
@@ -31,14 +34,14 @@ function change(){
     colorDark:"#000000",
     colorLight:"#ffffff"
   });
-  qrcode.makeCode(code);
+  qrcode.makeCode(JSON.stringify({
+    chromeId: __chrome_unique_id,
+    secretKey: code
+  }));
 
   // Remove title tooltip when hovered over
   document.getElementById("qrcode").removeAttribute("title");
 
-  if(timeout !== undefined){
-    clearTimeout(timeout);
-  }
   setTimeout(change, 30*1000);
 }
 
@@ -55,11 +58,17 @@ let backgroundCommunicator = chrome.extension.connect({
 
 backgroundCommunicator.postMessage('fetchPairingStatus');
 backgroundCommunicator.onMessage.addListener((data)=>{
-  if(data===undefined || data.isPaired===false){
-    isPaired = false;
-    change();
-  }else{
-    isPaired = true;
-    change();
-  }
+  isPaired = data.isPaired;
+  __chrome_unique_id = data.__chrome_unique_id;
+  change();
 });
+
+
+
+
+function removeClassElements(className){
+  let elements = document.getElementsByClassName(className);
+  for(let i = 0; i < elements.length; i++){
+    elements[i].remove();
+  }
+}

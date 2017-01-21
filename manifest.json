@@ -6,7 +6,7 @@
 
   "background":{
     "persistant": true,
-    "scripts": ["scripts/socketio.js", "scripts/background.js"]
+    "scripts": ["scripts/crypto-js/crypto-js.js", "scripts/socketio.js", "scripts/background.js"]
   },
 
   "browser_action":{
