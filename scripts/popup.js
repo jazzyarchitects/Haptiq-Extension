@@ -12,6 +12,7 @@ function randomString(length){
   return result;
 }
 
+let timeout = undefined;
 
 function change(){
   if(isPaired){
@@ -23,7 +24,6 @@ function change(){
   }
 
   let code = randomString(32);
-  console.log(code);
   document.getElementById("qrcode").innerHTML = null;
   let qrcode = new QRCode(document.getElementById("qrcode"), {
     width : 150,
@@ -36,7 +36,10 @@ function change(){
   // Remove title tooltip when hovered over
   document.getElementById("qrcode").removeAttribute("title");
 
-  setTimeout(change, 5*1000);
+  if(timeout !== undefined){
+    clearTimeout(timeout);
+  }
+  setTimeout(change, 30*1000);
 }
 
 function startShowingQRCode(){
@@ -46,4 +49,17 @@ function startShowingQRCode(){
 // Call qr generator after DOM loading
 setTimeout(startShowingQRCode, 0);
 
-let popup =
+let backgroundCommunicator = chrome.extension.connect({
+  name: 'PairingInquirer'
+});
+
+backgroundCommunicator.postMessage('fetchPairingStatus');
+backgroundCommunicator.onMessage.addListener((data)=>{
+  if(data===undefined || data.isPaired===false){
+    isPaired = false;
+    change();
+  }else{
+    isPaired = true;
+    change();
+  }
+});
