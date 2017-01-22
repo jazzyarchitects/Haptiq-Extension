@@ -14,6 +14,9 @@ chrome.storage.local.get((data)=>{
   __phone_unique_id = data.__phone_unique_id;
 
   if(__phone_fcm_id!==undefined){
+    if(document.getElementById("imageAuthenticationStatus")===undefined || document.getElementById("imageAuthenticationStatus")===null){
+      return;
+    }
     document.getElementById("imageAuthenticationStatus").setAttribute("src", "chrome-extension://jeknnconpjppjhdbdcchkoeeoamcejff/images/authenticated48.png");
     document.getElementById("imageAuthenticationStatus").addEventListener('click', ()=>{
       chrome.runtime.sendMessage({
@@ -27,26 +30,42 @@ chrome.storage.local.get((data)=>{
 
 
 //get form element
-function draw(){
+function draw(skip){
+  console.log("skip: "+skip);
+  skip = skip || 0;
   let forms = document.getElementsByTagName('form');
   console.log(forms);
+
+  if(forms.length<=0){
+    setTimeout(draw, 2000);
+    return;
+  }
+
   targetForm = forms[0];
 
-  for(let i=0;i<forms.length;i++){
+  for(let i=skip;i<forms.length;i++){
     console.log(forms[i]);
-    if(forms[i].name.toLowerCase().indexOf("login")!==-1 ||
-      forms[i].name.toLowerCase().indexOf("signin")!==-1 ||
-      forms[i].className.toLowerCase().indexOf("login")!==-1){
+    if(!forms[i].name){
+      forms[i].name = "Haptiq";
+    }
+    console.log(typeof(forms[i].name));
+    let id = forms[i].getAttribute("id") || "";
+    if(( forms[i].name && typeof(forms[i].name)!=="object" && forms[i].name.toLowerCase().indexOf("login")!==-1) ||
+      (forms[i].name && typeof(forms[i].name)!=="object" && forms[i].name.toLowerCase().indexOf("signin")!==-1) ||
+      forms[i].className.toLowerCase().indexOf("login")!==-1 ||
+      id.toLowerCase().indexOf("login") !== -1){
       targetForm = forms[i];
       break;
     }
   }
 
+  console.log(targetForm);
   // get username field
   let useridField = targetForm.querySelectorAll("input[type='text'], input[type='email']");
-
+  console.log("User field");
+  console.log(useridField);
   if(useridField.length<1){
-    return;
+    return draw(skip+1);
   }
 
   if(useridField.length >= 1){
@@ -56,11 +75,12 @@ function draw(){
 
   // get password fields
   let passwordField = targetForm.querySelectorAll("input[type='password']");
+  console.log("Password field");
   console.log(passwordField);
 
   if(passwordField.length<1){
     shouldShow = false;
-    return;
+    return draw(skip+1);
   }
 
   if(passwordField.length >= 1){
@@ -73,6 +93,11 @@ function draw(){
 
   let submitButton = targetForm.querySelectorAll("input[type='submit'], button[type='submit']");
   console.log(submitButton);
+
+
+  if(submitButton.length<=0){
+    let submitButton = targetForm.querySelectorAll("button");
+  }
 
   let submitButtonHolder = submitButton[0].parentNode;
 
@@ -116,7 +141,8 @@ function draw(){
 
 draw();
 
-document.addEventListener('click', ()=>{
+document.body.addEventListener('click', ()=>{
+  console.log("draw");
   draw();
 });
 
