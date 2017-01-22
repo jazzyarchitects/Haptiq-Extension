@@ -1,6 +1,8 @@
 "use strict";
 
-function decrypt(packet1, packet2){
+const SECRET = '!#bbdkQE3749&DN'
+
+function decryptPackets(packet1, packet2){
   let password = "";
   let key = "";
 
@@ -52,5 +54,9 @@ function decrypt(packet1, packet2){
     i++;
   }
 
+  let decryptedKey = CryptoJS.AES.decrypt(key, SECRET).toString(CryptoJS.enc.Utf8);
+  let decryptedPassword = CryptoJS.AES.decrypt(password, decryptedKey).toString(CryptoJS.enc.Utf8);
+
+  return decryptedPassword;
 
 }

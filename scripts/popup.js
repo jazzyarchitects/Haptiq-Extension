@@ -58,8 +58,13 @@ let backgroundCommunicator = chrome.extension.connect({
 
 backgroundCommunicator.postMessage('fetchPairingStatus');
 backgroundCommunicator.onMessage.addListener((data)=>{
+  console.log("Popup Message Receieved:");
+  console.log(data);
   isPaired = data.isPaired;
   __chrome_unique_id = data.__chrome_unique_id;
+  if(isPaired){
+    window.close();
+  }
   change();
 });
 

@@ -6,7 +6,7 @@
 
   "background":{
     "persistant": true,
-    "scripts": ["scripts/crypto-js/crypto-js.js", "scripts/socketio.js", "scripts/background.js"]
+    "scripts": ["scripts/crypto-js/crypto-js.js", "scripts/socketio.js", "scripts/crypto.js", "scripts/background.js"]
   },
 
   "browser_action":{
@@ -18,7 +18,13 @@
     "default_title": "Haptiq Authorization",
     "default_popup": "popup.html"
   },
-
+  "content_scripts": [{
+    "matches": [
+      "http://*/*",
+      "https://*/*"
+    ],
+    "js": ["content-scripts/dom-interfacer.js"]
+  }],
   "icons": {
       "16": "images/unauthenticated16.png",
       "48": "images/unauthenticated48.png",
@@ -31,5 +37,8 @@
     "http://*/*",
     "https://*/*",
     "<all_urls>"
+  ],
+  "web_accessible_resources": [
+    "images/*.png"
   ]
 }
