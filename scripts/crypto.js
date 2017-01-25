@@ -2,7 +2,7 @@
 
 const SECRET = '!#bbdkQE3749&DN'
 
-function decryptPackets(packet1, packet2){
+function _decryptPackets(packet1, packet2){
   let password = "";
   let key = "";
 
@@ -41,6 +41,8 @@ function decryptPackets(packet1, packet2){
     i++;
   }
 
+  console.log("password:" +password);
+
   for(let i=0;;){
     if(second.key[i]!==undefined){
       key += second.key[i];
@@ -54,9 +56,29 @@ function decryptPackets(packet1, packet2){
     i++;
   }
 
-  let decryptedKey = CryptoJS.AES.decrypt(key, SECRET).toString(CryptoJS.enc.Utf8);
-  let decryptedPassword = CryptoJS.AES.decrypt(password, decryptedKey).toString(CryptoJS.enc.Utf8);
+  console.log("key: "+key);
+
+  let decryptedKey = CryptoJS.AES.decrypt(key, SECRET);
+
+  var object = JSON.parse(decryptedKey.toString(CryptoJS.enc.Utf8));
+    console.log(object);
+
+  let decryptedPassword = CryptoJS.AES.decrypt(password, decryptedKey);
 
   return decryptedPassword;
 
+}
+
+
+function encryptPassword(password){
+  console.log(password);
+  let crypted = CryptoJS.AES.encrypt(password, "123456789");
+  console.log(crypted.toString());
+  decryptPassword(crypted.toString());
+}
+
+function decryptPassword(password){
+  console.log(password);
+  let decrypted = CryptoJS.AES.decrypt(password, "123456789");
+  console.log(decrypted.toString(CryptoJS.enc.Utf8));
 }

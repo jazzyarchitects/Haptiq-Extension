@@ -2,6 +2,7 @@
 
 
 let url = window.location.hostname;
+let useridField, passwordField, submitButton, imageButton;
 
 let __chrome_unique_id, __phone_fcm_id, __phone_unique_id;
 let targetForm = null;
@@ -43,10 +44,14 @@ function draw(skip){
 
   targetForm = forms[0];
 
+  if(skip>=forms.length){
+    return;
+  }
+
   for(let i=skip;i<forms.length;i++){
     console.log(forms[i]);
     if(!forms[i].name){
-      forms[i].name = "Haptiq";
+      forms[i].name = "";
     }
     console.log(typeof(forms[i].name));
     let id = forms[i].getAttribute("id") || "";
@@ -61,7 +66,7 @@ function draw(skip){
 
   console.log(targetForm);
   // get username field
-  let useridField = targetForm.querySelectorAll("input[type='text'], input[type='email']");
+  useridField = targetForm.querySelectorAll("input[type='text'], input[type='email']");
   console.log("User field");
   console.log(useridField);
   if(useridField.length<1){
@@ -74,7 +79,7 @@ function draw(skip){
 
 
   // get password fields
-  let passwordField = targetForm.querySelectorAll("input[type='password']");
+  passwordField = targetForm.querySelectorAll("input[type='password']");
   console.log("Password field");
   console.log(passwordField);
 
@@ -88,10 +93,10 @@ function draw(skip){
   }
 
   //test
-  useridField.value = "jibinmathews7@gmail.com";
-  passwordField.value = "123456789";
+  // useridField.value = "jibinmathews7@gmail.com";
+  // passwordField.value = "123456789";
 
-  let submitButton = targetForm.querySelectorAll("input[type='submit'], button[type='submit']");
+  submitButton = targetForm.querySelectorAll("input[type='submit'], button[type='submit']");
   console.log(submitButton);
 
 
@@ -103,7 +108,7 @@ function draw(skip){
 
   // console.log(submitButton[0].clientHeight);
 
-  let imageButton = document.createElement('img');
+  imageButton = document.createElement('img');
   let src = "chrome-extension://jeknnconpjppjhdbdcchkoeeoamcejff/images/authenticated48.png";
   if(__phone_fcm_id===undefined){
     src = "chrome-extension://jeknnconpjppjhdbdcchkoeeoamcejff/images/unauthenticated48.png";
@@ -122,14 +127,12 @@ function draw(skip){
   imageButton.style.height = submitButton[0].clientHeight+"px";
   imageButton.style.cursor = "pointer";
 
-  if(__phone_fcm_id!==undefined && shouldShow){
     imageButton.addEventListener('click', ()=>{
       chrome.runtime.sendMessage({
         type: "request-authentication",
         url: url
       });
     });
-  }
 
   if(document.location.pathname.indexOf("search")===-1 && shouldShow){
     if(document.getElementById("imageAuthenticationStatus")!==undefined){
@@ -146,13 +149,29 @@ document.body.addEventListener('click', ()=>{
   draw();
 });
 
+// chrome.extension.onMessage.addListener((request, sender)=>{
+//   let object = request.message;
+//   console.log(request);
+//   console.log(object);
+//   if(!object.userId || !object.password){
+//     return;
+//   }
+//   useridField.value = object.userid;
+//   passwordField.value = object.password;
+//   submitButton[0].click();
+// });
+
 chrome.runtime.onMessage.addListener((request, sender)=>{
+  console.log("Runtime");
   let object = request.message;
-  if(!object.userId || !object.password){
-    return;
-  }
-  useridField.value = object.userId;
-  passwordField.value = object.password;
+  console.log(request);
+  // console.log(object);
+  // if(!object.userid || !object.password){
+  //   return;
+  // }
+  useridField.value = request.userid;
+  passwordField.value = request.password;
+  submitButton[0].disabled = false;
   submitButton[0].click();
 });
 
