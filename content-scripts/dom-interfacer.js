@@ -149,26 +149,10 @@ document.body.addEventListener('click', ()=>{
   draw();
 });
 
-// chrome.extension.onMessage.addListener((request, sender)=>{
-//   let object = request.message;
-//   console.log(request);
-//   console.log(object);
-//   if(!object.userId || !object.password){
-//     return;
-//   }
-//   useridField.value = object.userid;
-//   passwordField.value = object.password;
-//   submitButton[0].click();
-// });
-
 chrome.runtime.onMessage.addListener((request, sender)=>{
   console.log("Runtime");
   let object = request.message;
   console.log(request);
-  // console.log(object);
-  // if(!object.userid || !object.password){
-  //   return;
-  // }
   useridField.value = request.userid;
   passwordField.value = request.password;
   submitButton[0].disabled = false;

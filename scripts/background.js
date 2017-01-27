@@ -1,6 +1,7 @@
 "use strict";
 
-let socket = io.connect("http://52.25.225.108");
+// let socket = io.connect("http://52.25.225.108");
+let socket = io.connect("");
 
 let PortBroadcast = undefined;
 let ContentBroadcast = undefined;
@@ -10,7 +11,7 @@ let ContentBroadcast = undefined;
 let __chrome_unique_id = undefined;
 let __storage = undefined;
 chrome.storage.local.get((data)=>{
-  console.log(data);
+  // console.log(data);
   __storage = data;
   if(data.__chrome_unique_id===undefined){
     socket.emit('join', {});
@@ -49,40 +50,41 @@ socket.on('pairing', (data)=>{
 
 let packets = [];
 
-socket.on('mobile-authentication', (data)=>{
-  console.log(data);
-  // console.log(data);
-  // if(packets.length<=1){
-    // packets.push(data);
-  // }
-  // if(packets.length===2){
-    // let password = decryptPackets(packets[0], packets[1]);
-    // console.log(password);
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs)=>{
-      chrome.tabs.sendMessage(tabs[0].id, data, (response)=>{
-        console.log(response);
-      });
-    });
-  // }
-});
+// socket.on('mobile-authentication', (data)=>{
+//   console.log(data);
+//   // console.log(data);
+//   // if(packets.length<=1){
+//     // packets.push(data);
+//   // }
+//   // if(packets.length===2){
+//     // let password = decryptPackets(packets[0], packets[1]);
+//     // console.log(password);
+//     chrome.tabs.query({active: true, currentWindow: true}, (tabs)=>{
+//       chrome.tabs.sendMessage(tabs[0].id, data, (response)=>{
+//         console.log(response);
+//       });
+//     });
+//   // }
+// });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
   console.log(request);
   if(request.type==="request-authentication"){
     if(!__storage.__phone_fcm_id){
 
-      let a = request.url.split(".");
-      console.log(a);
-      let u = a[1];
-      if(a[0].indexOf("www")===-1){
-        u = a[0];
-      }
+      // let a = request.url.split(".");
+      // console.log(a);
+      // let u = a[1];
+      // if(a[0].indexOf("www")===-1){
+      //   u = a[0];
+      // }
+
 
       chrome.storage.local.get((data)=>{
         __storage = data;
         socket.emit('initiate-authentication', {
       fcm: __storage.__phone_fcm_id,
-      url: u,
+      url: request.url,
       chromeId: __storage.__chrome_unique_id
     });
       });
@@ -113,6 +115,10 @@ chrome.extension.onConnect.addListener((port)=>{
   }
 });
 
+socket.on('mobile-authentication', (data)=>{
+
+});
+
 
 // Clear cookies when first installed
 chrome.runtime.onInstalled.addListener(()=>{
@@ -120,4 +126,6 @@ chrome.runtime.onInstalled.addListener(()=>{
   // chrome.tabs.create({url: newURL});
 });
 
-encryptPassword("abcdef");
+// encryptPassword("abcdef");
+
+// console.log(getMobileField());
