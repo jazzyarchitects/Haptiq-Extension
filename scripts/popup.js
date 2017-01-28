@@ -3,15 +3,28 @@
 let isPaired = false;
 let __chrome_unique_id = undefined;
 
-const allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980!@#$%^&*()_+-={}[]<>|";
 
-function randomString(length){
-  let result="";
-  for(let i=length;i>0;i--){
-    result = result + allowed[Math.floor(Math.random()*allowed.length)];
-  }
-  return result;
-}
+
+
+
+
+
+
+let backgroundCommunicator = chrome.extension.connect({
+  name: 'PairingInquirer'
+});
+
+backgroundCommunicator.postMessage('fetchPairingStatus');
+backgroundCommunicator.onMessage.addListener((data)=>{
+  console.log("Popup Message Receieved:");
+  console.log(data);
+  isPaired = data.isPaired;
+  __chrome_unique_id = data.__chrome_unique_id;
+  
+  change();
+});
+
+
 
 
 function change(){
@@ -26,7 +39,6 @@ function change(){
     setTimeout(change, 0.5*1000);
   }
 
-  let code = randomString(32);
   document.getElementById("qrcode").innerHTML = null;
   let qrcode = new QRCode(document.getElementById("qrcode"), {
     width : 150,
@@ -51,22 +63,6 @@ function startShowingQRCode(){
 
 // Call qr generator after DOM loading
 setTimeout(startShowingQRCode, 0);
-
-let backgroundCommunicator = chrome.extension.connect({
-  name: 'PairingInquirer'
-});
-
-backgroundCommunicator.postMessage('fetchPairingStatus');
-backgroundCommunicator.onMessage.addListener((data)=>{
-  console.log("Popup Message Receieved:");
-  console.log(data);
-  isPaired = data.isPaired;
-  __chrome_unique_id = data.__chrome_unique_id;
-  if(isPaired){
-    window.close();
-  }
-  change();
-});
 
 
 

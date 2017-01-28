@@ -5,7 +5,7 @@
   "description": "Helps you signin to your favorite sites with your Android Phone's Fingerprint Scanner.",
 
   "background":{
-    "persistant": true,
+    "persistent": true,
     "scripts": ["scripts/crypto-js/crypto-js.js", "scripts/socketio.js", "scripts/randoms.js", "scripts/crypto.js", "scripts/background.js"]
   },
 

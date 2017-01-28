@@ -1,7 +1,10 @@
 "use strict";
 
 // let socket = io.connect("http://52.25.225.108");
-let socket = io.connect("");
+let socket = io.connect("",{
+  // TODO:  Remove this in production
+  reconnection : false
+});
 
 let PortBroadcast = undefined;
 let ContentBroadcast = undefined;
@@ -50,36 +53,10 @@ socket.on('pairing', (data)=>{
 
 let packets = [];
 
-// socket.on('mobile-authentication', (data)=>{
-//   console.log(data);
-//   // console.log(data);
-//   // if(packets.length<=1){
-//     // packets.push(data);
-//   // }
-//   // if(packets.length===2){
-//     // let password = decryptPackets(packets[0], packets[1]);
-//     // console.log(password);
-//     chrome.tabs.query({active: true, currentWindow: true}, (tabs)=>{
-//       chrome.tabs.sendMessage(tabs[0].id, data, (response)=>{
-//         console.log(response);
-//       });
-//     });
-//   // }
-// });
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
   console.log(request);
   if(request.type==="request-authentication"){
     if(!__storage.__phone_fcm_id){
-
-      // let a = request.url.split(".");
-      // console.log(a);
-      // let u = a[1];
-      // if(a[0].indexOf("www")===-1){
-      //   u = a[0];
-      // }
-
-
       chrome.storage.local.get((data)=>{
         __storage = data;
         socket.emit('initiate-authentication', {
@@ -128,4 +105,4 @@ chrome.runtime.onInstalled.addListener(()=>{
 
 // encryptPassword("abcdef");
 
-// console.log(getMobileField());
+// console.log(Random.getMobileField());
