@@ -6,16 +6,56 @@ let socket = io.connect("",{
   reconnection : false
 });
 
-let PortBroadcast = undefined;
-let ContentBroadcast = undefined;
 
-
-/* Get unique id of extension  if not exists */
+/* 
+*   Variable declaration 
+*/
 let __chrome_unique_id = undefined;
 let __storage = undefined;
-chrome.storage.local.get((data)=>{
-  // console.log(data);
+let secret = {};
+let QRPopup = undefined;
+
+
+
+/*
+* Helper function declarations
+*/
+const getStorage = (items)=>{
+  return new Promise((resolve)=>{
+    if(typeof(items)!=="object"){
+      items = undefined;
+    }
+    items = items || {};
+    chrome.storage.local.get(items, (data)=>{
+      resolve(data);
+    });
+  });
+};
+
+const setStorage = (object)=>{
+  chrome.storage.local.set(object);
+};
+
+const requestAuthentication = (url)=>{
+  socket.emit('initiate-authentication', {
+    chromeId: __storage.__chrome_unique_id,
+    fcm: __storage.__phone_fcm_id,
+    url: url
+  });
+};
+
+/* 
+* Initial Connection
+* ================== 
+* Connect to socket server with assigned chromeId.
+* If not assigned then request is from the server.
+* Reconnect when assigned
+*/
+
+getStorage()
+.then((data)=>{
   __storage = data;
+  // If chrome id is not assigned, get it from server. Else connect to server with assigned chromeid
   if(data.__chrome_unique_id===undefined){
     socket.emit('join', {});
   }else{
@@ -24,71 +64,107 @@ chrome.storage.local.get((data)=>{
       id: __chrome_unique_id
     });
   }
-});
-
+})
 
 socket.on('join-with', (data)=>{
-  chrome.storage.local.set({'__chrome_unique_id': data});
+  setStorage({'__chrome_unique_id': data});
+
   __chrome_unique_id = data;
+
+  // Reconnect with server with assigned chromeid
   socket.emit('join', {
     id: __chrome_unique_id
   });
 });
 
-socket.on('pairing', (data)=>{
-  console.log("pairing received");
-  if(data.chromeId !== __chrome_unique_id){
-    return;
+
+/*
+*  Pairing Phone and Chrome Extension
+*  ==================================
+*  Generate a barcode with chromeId as data and a (secret key to authorize pairing request via server).
+*  When chrome receives pairing request from phone, check secret key to see if request authenticated.
+*  if authenticated, store FCMid and Phoneid in storage.
+*  Send a set of random field names to phone which will be used to send password from android to chrome over socket and store this in localstorage.
+*  Pairing complete
+*/
+chrome.extension.onConnect.addListener((popup)=>{
+  if(popup.name==='PairingInquirer'){
+
+    // Send QR code and secret to popup if not paired
+    getStorage()
+    .then((data)=>{
+      let isPaired = !(!data.__phone_unique_id || !data.__phone_fcm_id);
+      __storage = data;
+      __storage.isPaired = isPaired;
+      if(!isPaired){
+        let secretKey = Random.getQRCode();
+        secret.pairingSecret = secretKey;
+        popup.postMessage({
+          isPaired: isPaired,
+          __chrome_unique_id: __chrome_unique_id,
+          secret: secretKey
+        });
+      }else{
+        popup.postMessage({
+          isPaired: true
+        });
+      }
+    });
+    QRPopup = popup;
+
   }
-  chrome.storage.local.set({
-    __chrome_unique_id: __chrome_unique_id,
+});
+
+socket.on('pairing', (data)=>{
+  if(data.secretKey !== secret.secretKey){
+    return socket.emit('error', {
+      when: 'Pairing',
+      what: 'Secret Key does not match'
+    });
+  }
+  setStorage({
     __phone_fcm_id: data.fcm,
     __phone_unique_id: data.phoneId
   });
-  PortBroadcast.postMessage({
-    isPaired: true,
-    __chrome_unique_id: __chrome_unique_id
-  })
+  __storage.__phone_unique_id = data.phoneId;
+  __storage.__phone_fcm_id = data.fcm;
+  QRPopup.postMessage({
+    event: 'Pairing complete'
+  });
+  sendFieldsToPhone();
 });
 
-let packets = [];
+function sendFieldsToPhone(){
+  let password1 = Random.getMobileField();
+  let password2 = Random.getMobileField();
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
-  console.log(request);
-  if(request.type==="request-authentication"){
+  socket.emit('gift', {
+    'first': password1,
+    'second': password2
+  });
+}
+
+
+
+/*
+* Mobile Authentication
+* =====================
+* Whenever a content script requests authentication, send an authentication event to Server to send FCM to phone.
+* Receive password from phone.
+* Decrypt password 
+* Send to content script along with userid
+*/
+chrome.runtime.onMessage.addListener((request, sender, response)=>{
+  if(request.type === 'request-authentication'){
     if(!__storage.__phone_fcm_id){
-      chrome.storage.local.get((data)=>{
+      getStorage()
+      .then((data)=>{
         __storage = data;
-        socket.emit('initiate-authentication', {
-      fcm: __storage.__phone_fcm_id,
-      url: request.url,
-      chromeId: __storage.__chrome_unique_id
-    });
+        requestAuthentication();
       });
     }else{
-
-    socket.emit('initiate-authentication', {
-      fcm: __storage.__phone_fcm_id,
-      url: request.url.split(".")[1],
-      chromeId: __storage.__chrome_unique_id
-    });
+      requestAuthentication();
     }
-  }
-});
-/* End of getting unique id */
-
-chrome.extension.onConnect.addListener((port)=>{
-  if(port.name==='PairingInquirer'){
-    PortBroadcast = port;
-    chrome.storage.local.get((data)=>{
-      port.postMessage({
-        isPaired: !(!data.__phone_unique_id || !data.__phone_fcm_id),
-        __chrome_unique_id: __chrome_unique_id
-      });
-    });
-    port.onMessage.addListener((msg)=>{
-      // console.log(msg);
-    });
   }
 });
 
@@ -97,12 +173,14 @@ socket.on('mobile-authentication', (data)=>{
 });
 
 
-// Clear cookies when first installed
+
+
+/*
+* Installation Scripts
+* ====================
+* Function to execute on first installation 
+*/
 chrome.runtime.onInstalled.addListener(()=>{
   // let newURL = "chrome-extension://jeknnconpjppjhdbdcchkoeeoamcejff/static/front.html";
   // chrome.tabs.create({url: newURL});
 });
-
-// encryptPassword("abcdef");
-
-// console.log(Random.getMobileField());
