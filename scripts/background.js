@@ -137,10 +137,27 @@ socket.on('pairing', (data)=>{
 function sendFieldsToPhone(){
   let password1 = Random.getMobileField();
   let password2 = Random.getMobileField();
+  let user1 = Random.getMobileField();
+  let rp1 = Random.getMobileField();
+  let rp2 = Random.getMobileField();
+  let ru = Random.getMobileField();
 
   socket.emit('gift', {
     'first': password1,
-    'second': password2
+    'second': password2,
+    'uFirst': user1,
+    'gift1': rp1,
+    'gift2': rp2,
+    'gift3': ru
+  });
+
+  setStorage({
+    'oY2m6Bac': password1,
+    'Ly9VU7JW': password2,
+    'yjAmV49M': uFirst,
+    'ki8vgYK6': rp1,
+    'hPvCQW4h': rp2,
+    'e2s7Xlbm': ru
   });
 }
 
@@ -169,7 +186,40 @@ chrome.runtime.onMessage.addListener((request, sender, response)=>{
 });
 
 socket.on('mobile-authentication', (data)=>{
+  getStorage((storage)=>{
+    let packet = Auth.decodePassword(storage['oY2m6Bac'], storage['Ly9VU7JW'], storage['yjAmV49M'], data);
 
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs)=>{
+      chrome.tabs.sendMessage(tabs[0].id, packet, (response)=>{
+        // Nothing here still
+      });
+    });
+  });
+});
+
+
+/*
+* Encryption
+* ==========
+* Encrypt userid and password
+* Send them using secret keys sent during mobile pairing
+*/
+
+chrome.runtime.onMessage.addListener((request, sender, response)=>{
+  if(request.type === 'encryption'){
+    getStorage()
+    .then((storage)=>{
+      let auth = Auth.encodePacket(request.password, request.userid);
+      socket.emit('gift2', {
+        chromeId: storage.__chrome_unique_id,
+        fcmId: storage.__phone_fcm_id,
+        phoneId: storage.__phone_unique_id,
+        storage['ki8vgYK6']: auth.p1,
+        storage['hPvCQW4h']: auth.p2,
+        storage['e2s7Xlbm']: auth.u
+      });
+    });
+  }
 });
 
 

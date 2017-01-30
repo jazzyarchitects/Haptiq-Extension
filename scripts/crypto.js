@@ -1,8 +1,9 @@
 "use strict";
 
-const SECRET = '!#bbdkQE3749&DN'
+const SECRET = '!#bbdkQE3749&DN';
+const SECRET2 = '4ycgUk$Nm@8Nv*ukdkxV';
 
-class Auth{
+class Crypto{
 
   static encryptPassword(password){
     let crypted = CryptoJS.AES.encrypt(password, SECRET);
@@ -12,6 +13,16 @@ class Auth{
   static decryptPassword(password){
     let decrypted = CryptoJS.AES.decrypt(password, SECRET);
     return decrypted.toString(CryptoJS.enc.Utf8);
+  }
+
+  static encryptUser(userid){
+    let crypted = CryptoJS.AES.encrypt(userid, SECRET2);
+    return crypted.toString();
+  }
+
+  static decryptUser(userid){
+    let decrypted = CryptoJS.AES.decrypt(userid, SECRET2);
+    return decrypt.toString(CryptoJS.enc.Utf8);
   }
 }
 
