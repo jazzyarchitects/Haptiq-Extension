@@ -10,7 +10,8 @@
       "scripts/crypto-js/crypto-js.js", 
       "scripts/socketio.js", 
       "scripts/randoms.js", 
-      "scripts/crypto.js", 
+      "scripts/crypto.js",
+      "scripts/auth.js",
       "scripts/background.js"
     ]
   },
