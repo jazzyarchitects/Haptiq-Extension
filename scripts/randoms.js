@@ -24,6 +24,41 @@ class Random {
     }
 
     str = a.join("");
+    
+    /* To check if scrambling algorithm works */
+    /*
+    console.log(s);
+    console.log(str);
+
+    let aa = s.split('');
+    let ss = str.split('');
+
+    let aaa = {};
+    let sss = {};
+
+    for(let i = 0; i < aa.length;i++){
+      if(!aaa[aa[i]]){
+        aaa[aa[i]]=0;
+      }
+      aaa[aa[i]]++;
+    }
+
+    for(let i = 0; i < ss.length;i++){
+      if(!sss[ss[i]]){
+        sss[ss[i]]=0;
+      }
+      sss[ss[i]]++;
+    }
+
+    for(let key of Object.keys(aaa)){
+      sss[key] = sss[key] - aaa[key];
+    }
+
+    console.log(aaa);
+    console.log(sss);
+
+    */
+
     return str;
   }
 

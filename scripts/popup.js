@@ -2,13 +2,7 @@
 
 let isPaired = false;
 let __chrome_unique_id = undefined;
-
-
-
-
-
-
-
+let code = undefined;
 
 let backgroundCommunicator = chrome.extension.connect({
   name: 'PairingInquirer'
@@ -16,11 +10,11 @@ let backgroundCommunicator = chrome.extension.connect({
 
 backgroundCommunicator.postMessage('fetchPairingStatus');
 backgroundCommunicator.onMessage.addListener((data)=>{
-  console.log("Popup Message Receieved:");
-  console.log(data);
-  isPaired = data.isPaired;
-  __chrome_unique_id = data.__chrome_unique_id;
-  
+
+  isPaired = data.isPaired,
+  __chrome_unique_id = data.__chrome_unique_id,
+  code = data.secret
+
   change();
 });
 
@@ -35,9 +29,9 @@ function change(){
     removeClassElements("paired");
   }
 
-  if(__chrome_unique_id===undefined){
-    setTimeout(change, 0.5*1000);
-  }
+  // if(__chrome_unique_id===undefined){
+  //   setTimeout(change, 0.5*1000);
+  // }
 
   document.getElementById("qrcode").innerHTML = null;
   let qrcode = new QRCode(document.getElementById("qrcode"), {
@@ -46,6 +40,7 @@ function change(){
     colorDark:"#000000",
     colorLight:"#ffffff"
   });
+
   qrcode.makeCode(JSON.stringify({
     chromeId: __chrome_unique_id,
     secretKey: code
@@ -53,18 +48,14 @@ function change(){
 
   // Remove title tooltip when hovered over
   document.getElementById("qrcode").removeAttribute("title");
-
-  setTimeout(change, 30*1000);
 }
 
-function startShowingQRCode(){
-  change();
+window.onload = function(){
+  document.getElementById('openCredentials').addEventListener('click', ()=>{
+    let newURL = "chrome-extension://jeknnconpjppjhdbdcchkoeeoamcejff/manage.html";
+    chrome.tabs.create({url: newURL});
+  });
 }
-
-// Call qr generator after DOM loading
-setTimeout(startShowingQRCode, 0);
-
-
 
 
 function removeClassElements(className){

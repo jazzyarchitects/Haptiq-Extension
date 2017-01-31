@@ -20,13 +20,11 @@ let QRPopup = undefined;
 /*
 * Helper function declarations
 */
-const getStorage = (items)=>{
+const getStorage = ()=>{
   return new Promise((resolve)=>{
-    if(typeof(items)!=="object"){
-      items = undefined;
-    }
-    items = items || {};
-    chrome.storage.local.get(items, (data)=>{
+    chrome.storage.local.get((data)=>{
+      console.log("Storage");
+      console.log(data);
       resolve(data);
     });
   });
@@ -98,6 +96,7 @@ chrome.extension.onConnect.addListener((popup)=>{
       __storage.isPaired = isPaired;
       if(!isPaired){
         let secretKey = Random.getQRCode();
+        console.log('Secret Key: '+secretKey);
         secret.pairingSecret = secretKey;
         popup.postMessage({
           isPaired: isPaired,
@@ -210,14 +209,15 @@ chrome.runtime.onMessage.addListener((request, sender, response)=>{
     getStorage()
     .then((storage)=>{
       let auth = Auth.encodePacket(request.password, request.userid);
-      socket.emit('gift2', {
+      let data = {
         chromeId: storage.__chrome_unique_id,
         fcmId: storage.__phone_fcm_id,
-        phoneId: storage.__phone_unique_id,
-        storage['ki8vgYK6']: auth.p1,
-        storage['hPvCQW4h']: auth.p2,
-        storage['e2s7Xlbm']: auth.u
-      });
+        phoneId: storage.__phone_unique_id
+      };
+      data[storage['ki8vgYK6']] = auth.p1;
+      data[storage['hPvCQW4h']] = auth.p2;
+      data[storage['e2s7Xlbm']] = auth.u;
+      socket.emit('gift2', data);
     });
   }
 });

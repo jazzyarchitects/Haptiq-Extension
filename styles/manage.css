@@ -1,0 +1,35 @@
+html{
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+body{
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+
+.fingerprint-authentication{
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 999;
+  background: #6037A5;
+  color: #fff;
+}
+
+.fingerprint-authentication div{
+  margin: auto;
+  position: relative;
+  top: 30%;
+}
+
+.fingerprint-authentication p{
+  font-size: 24px;
+  text-align: center;
+}
