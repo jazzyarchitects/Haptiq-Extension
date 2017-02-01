@@ -1,15 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="haptiq">
 <head>
   <title>Haptiq Secure Management</title>
-  <link rel="stylesheet" type="text/css" href="styles/manage.css" />
+  <link rel="stylesheet" href="styles/manage.css" />
+  <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
+  <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" >
+
+  <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+  <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+  <script src="bower_components/angular-aria/angular-aria.min.js"></script>
+  <script src="bower_components/angular-messages/angular-messages.min.js"></script>
+
+  <!-- Angular Material Library -->
+  <script src="../bower_components/angular-material/angular-material.min.js"></script>
+  <script type="text/javascript" src="scripts/manage.js"></script>
 </head>
-<body>
-<div class="fingerprint-authentication">
-<div class="container">
-  <center><img src="images/ic_action_fingerprint.png" /></center>
-  <p>Authenticate yourself to access this page.<br />Scan your fingerprint on your phone</p>
+<body ng-controller='MainController' ng-init="init()">
+<md-toolbar class="md-hue-2 toolbar">
+    <div class="md-toolbar-tools">
+      <h2>
+        <span>HAPTIQ</span>
+      </h2>
+      <span flex="">
+
+      </span>
+    </div>
+  </md-toolbar>
+  
+  <div class="fingerprint-authentication" ng-if="!isAuthenticated">
+    <div>
+      <center><img src="images/ic_action_fingerprint.png" /></center>
+      <p>Authenticate yourself to access this page.<br />Scan your fingerprint on your phone</p>
+    </div>
+  </div>
+  <div class="settings" ng-if="isAuthenticated">
+
+
+    
+
+  <md-content class="container">
+    <h1>Haptiq enabled sites </h1>
+    <div class="site-list" layout="row" layout-wrap layout-sm="column">
+      <div ng-repeat="account in accounts" flex="30" flex-sm="50" flex-xs="100">
+      <md-card>
+        <md-card-header>{{ account.url }}</md-card-header>
+        <md-card-content>
+        <img ng-src="https://www.google.com/s2/favicons?domain={{ account.url }}" />
+        {{account.id}} <br />
+        {{account.modifiedOn}}<br />
+      </md-card-content>
+    </md-card>
+  </div>
 </div>
+</md-content>
 </div>
 </body>
 </html>

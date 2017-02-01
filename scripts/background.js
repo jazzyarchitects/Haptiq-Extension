@@ -234,3 +234,11 @@ chrome.runtime.onInstalled.addListener(()=>{
   // let newURL = "chrome-extension://jeknnconpjppjhdbdcchkoeeoamcejff/static/front.html";
   // chrome.tabs.create({url: newURL});
 });
+
+
+// setInterval(()=>{
+//   chrome.runtime.sendMessage({
+//     from: 'background.js',
+//     msg: 'Hello'
+//   })  ;
+// }, 1000);

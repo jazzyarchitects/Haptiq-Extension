@@ -32,10 +32,10 @@ chrome.storage.local.get((data)=>{
 
 //get form element
 function draw(skip){
-  console.log("skip: "+skip);
+  // console.log("skip: "+skip);
   skip = skip || 0;
   let forms = document.getElementsByTagName('form');
-  console.log(forms);
+  // console.log(forms);
 
   if(forms.length<=0){
     setTimeout(draw, 2000);
@@ -49,11 +49,11 @@ function draw(skip){
   }
 
   for(let i=skip;i<forms.length;i++){
-    console.log(forms[i]);
+    // console.log(forms[i]);
     if(!forms[i].name){
       forms[i].name = "";
     }
-    console.log(typeof(forms[i].name));
+    // console.log(typeof(forms[i].name));
     let id = forms[i].getAttribute("id") || "";
     if(( forms[i].name && typeof(forms[i].name)!=="object" && forms[i].name.toLowerCase().indexOf("login")!==-1) ||
       (forms[i].name && typeof(forms[i].name)!=="object" && forms[i].name.toLowerCase().indexOf("signin")!==-1) ||
@@ -64,11 +64,11 @@ function draw(skip){
     }
   }
 
-  console.log(targetForm);
+  // console.log(targetForm);
   // get username field
   useridField = targetForm.querySelectorAll("input[type='text'], input[type='email']");
-  console.log("User field");
-  console.log(useridField);
+  // console.log("User field");
+  // console.log(useridField);
   if(useridField.length<1){
     return draw(skip+1);
   }
@@ -80,8 +80,8 @@ function draw(skip){
 
   // get password fields
   passwordField = targetForm.querySelectorAll("input[type='password']");
-  console.log("Password field");
-  console.log(passwordField);
+  // console.log("Password field");
+  // console.log(passwordField);
 
   if(passwordField.length<1){
     shouldShow = false;
@@ -97,7 +97,7 @@ function draw(skip){
   // passwordField.value = "123456789";
 
   submitButton = targetForm.querySelectorAll("input[type='submit'], button[type='submit']");
-  console.log(submitButton);
+  // console.log(submitButton);
 
 
   if(submitButton.length<=0){
@@ -118,8 +118,8 @@ function draw(skip){
   imageButton.setAttribute("title", "Haptiq Login");
   imageButton.style["z-index"] = 99999;
   imageButton.style.position = "absolute";
-  console.log(getOffset(submitButton[0]).left);
-  console.log(submitButton[0].clientWidth);
+  // console.log(getOffset(submitButton[0]).left);
+  // console.log(submitButton[0].clientWidth);
   imageButton.style.left = (getOffset(submitButton[0]).left + submitButton[0].clientWidth+3)+"px";
   imageButton.style.top = getOffset(submitButton[0]).top+"px";
   imageButton.style["border-radius"] = "5px";
@@ -138,16 +138,14 @@ function draw(skip){
     if(document.getElementById("imageAuthenticationStatus")!==undefined){
       document.body.appendChild(imageButton);
     }
+    // document.body.addEventListener('click', ()=>{
+    //   draw();
+    // });
   }
 }
 
 
 draw();
-
-document.body.addEventListener('click', ()=>{
-  console.log("draw");
-  draw();
-});
 
 chrome.runtime.onMessage.addListener((request, sender)=>{
   console.log("Runtime");
@@ -167,7 +165,6 @@ chrome.runtime.onMessage.addListener((request, sender)=>{
 
 function getOffset(el) {
   el = el.getBoundingClientRect();
-  console.log(el);
   return {
     left: el.left,
     top: el.top + window.scrollY
