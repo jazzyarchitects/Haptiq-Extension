@@ -96,7 +96,6 @@ chrome.extension.onConnect.addListener((popup)=>{
       __storage.isPaired = isPaired;
       if(!isPaired){
         let secretKey = Random.getQRCode();
-        console.log('Secret Key: '+secretKey);
         secret.pairingSecret = secretKey;
         popup.postMessage({
           isPaired: isPaired,
@@ -223,6 +222,19 @@ chrome.runtime.onMessage.addListener((request, sender, response)=>{
 });
 
 
+/*
+* Manage Page Authentication
+* ==========================
+*/
+chrome.runtime.onMessage.addListener((request, sender, response)=>{
+  if(request.type === 'manage-authentication'){
+    socket.emit('initiate-authentication', {
+      chromeId: __storage.__chrome_unique_id,
+      fcm: __storage.__phone_fcm_id,
+      type: 'ManagePage'
+    });
+  }
+});
 
 
 /*
@@ -242,3 +254,13 @@ chrome.runtime.onInstalled.addListener(()=>{
 //     msg: 'Hello'
 //   })  ;
 // }, 1000);
+
+
+/*
+* TODO
+* ====
+* Setting Page:
+*   -> Authentication to open
+*   -> Delete Option
+*   -> Add Option
+*/

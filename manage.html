@@ -2,7 +2,6 @@
 <html ng-app="haptiq">
 <head>
   <title>Haptiq Secure Management</title>
-  <link rel="stylesheet" href="styles/manage.css" />
   <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
   <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" >
 
@@ -13,6 +12,7 @@
 
   <!-- Angular Material Library -->
   <script src="../bower_components/angular-material/angular-material.min.js"></script>
+  <link rel="stylesheet" href="styles/manage.css" />
   <script type="text/javascript" src="scripts/manage.js"></script>
 </head>
 <body ng-controller='MainController' ng-init="init()">
@@ -26,7 +26,7 @@
       </span>
     </div>
   </md-toolbar>
-  
+
   <div class="fingerprint-authentication" ng-if="!isAuthenticated">
     <div>
       <center><img src="images/ic_action_fingerprint.png" /></center>
@@ -41,13 +41,44 @@
   <md-content class="container">
     <h1>Haptiq enabled sites </h1>
     <div class="site-list" layout="row" layout-wrap layout-sm="column">
-      <div ng-repeat="account in accounts" flex="30" flex-sm="50" flex-xs="100">
+      <div ng-repeat="account in accounts" flex="33" flex-sm="50" flex-xs="100" >
       <md-card>
-        <md-card-header>{{ account.url }}</md-card-header>
+        <div layout="row">
+          <div flex="20">
+          <!-- <img  /> -->
+          <img src="images/unauthenticated48.png" ng-src="https://www.google.com/s2/favicons?domain={{ account.url }}" class="card-image" style="margin: 50% 18px; height: 36px; width: 36px;" />
+          </div>
+          <div flex="60">
+            <md-card-header>
+          <center>{{ account.url }}</center>
+        </md-card-header>
         <md-card-content>
-        <img ng-src="https://www.google.com/s2/favicons?domain={{ account.url }}" />
-        {{account.id}} <br />
-        {{account.modifiedOn}}<br />
+          <table>
+            <tr>
+              <td style="font-size: 1.2em;">
+                <i class="fa fa-user"></i> &nbsp;{{account.id}}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Last Modified on: {{account.modifiedOn | dateFixer}}
+              </td>
+            </tr>
+          </table>
+      </md-card-content>
+          </div>
+          <div flex="20" layout="column" class="card-options">
+            <i class="fa fa-edit card-option" title="Edit"></i>
+            <i class="fa fa-trash card-option" title="Delete"></i>
+          </div>
+        </div>
+        
+    </md-card>
+  </div>
+  <div class="add" flex="33" flex-sm="50" flex-xs="100" >
+    <md-card>
+      <md-card-content>
+        <center><i class="fa fa-plus" style="margin: 28px auto; font-size: 36px; color: #555;"></i></center>
       </md-card-content>
     </md-card>
   </div>

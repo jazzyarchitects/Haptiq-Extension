@@ -50,7 +50,54 @@ body{
   margin: auto;
 }
 
+md-content{
+  overflow: hidden;
+}
+
 md-card-header{
   font-size: 18px;
   text-align: center;
 }
+
+md-card md-card-header{
+  padding-bottom: 8px;
+  height: 26px;
+}
+
+md-card md-card-content{
+  padding-top: 8px;
+  height: 76px;
+}
+
+md-card{
+  select: false;
+  height: 120px;
+}
+
+.card-image{
+  margin: 50% 15px;
+}
+
+.card-options{
+  font-size: 24px;
+}
+
+.card-option{
+   margin-top: 10px;
+   cursor: pointer;
+   color: #888;
+  transition-duration: 300ms;
+}
+
+.card-option:hover{
+  transform: scale(1.1);
+  color: #000;
+  transition-duration: 300ms;
+  margin-left: 5px;
+}
+
+.card-options .card-option:nth-child(1){
+  margin-top: 25px;
+}
+
+

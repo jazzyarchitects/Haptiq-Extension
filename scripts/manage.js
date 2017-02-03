@@ -20,50 +20,6 @@ app.controller('MainController', ($scope)=>{
     url: 'www.facebook.com',
     id: 'jibinmathews7',
     modifiedOn: new Date()
-  },{
-    url: 'www.facebook.com',
-    id: 'jibinmathews7',
-    modifiedOn: new Date()
-  },{
-    url: 'www.facebook.com',
-    id: 'jibinmathews7',
-    modifiedOn: new Date()
-  },{
-    url: 'www.facebook.com',
-    id: 'jibinmathews7',
-    modifiedOn: new Date()
-  },{
-    url: 'www.facebook.com',
-    id: 'jibinmathews7',
-    modifiedOn: new Date()
-  },{
-    url: 'www.facebook.com',
-    id: 'jibinmathews7',
-    modifiedOn: new Date()
-  },{
-    url: 'www.facebook.com',
-    id: 'jibinmathews7',
-    modifiedOn: new Date()
-  },{
-    url: 'www.facebook.com',
-    id: 'jibinmathews7',
-    modifiedOn: new Date()
-  },{
-    url: 'www.facebook.com',
-    id: 'jibinmathews7',
-    modifiedOn: new Date()
-  },{
-    url: 'www.facebook.com',
-    id: 'jibinmathews7',
-    modifiedOn: new Date()
-  },{
-    url: 'www.facebook.com',
-    id: 'jibinmathews7',
-    modifiedOn: new Date()
-  },{
-    url: 'www.facebook.com',
-    id: 'jibinmathews7',
-    modifiedOn: new Date()
   }];
 
   $scope.isAuthenticated = true;
@@ -82,5 +38,13 @@ app.controller('MainController', ($scope)=>{
 });
 
 
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
 
+app.filter('dateFixer', ()=>{
+  return (date)=>{
 
+    let d = new Date(date);
+    let string = d.getDate()+"-"+months[d.getMonth()]+"-"+d.getFullYear();
+    return string;
+  }
+});
