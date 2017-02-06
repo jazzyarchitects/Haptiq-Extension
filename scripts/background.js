@@ -84,6 +84,8 @@ socket.on('join-with', (data)=>{
 *  if authenticated, store FCMid and Phoneid in storage.
 *  Send a set of random field names to phone which will be used to send password from android to chrome over socket and store this in localstorage.
 *  Pairing complete
+*  r* variable name represents fields for sending to phone
+*  others for receiving from phone
 */
 chrome.extension.onConnect.addListener((popup)=>{
   if(popup.name==='PairingInquirer'){
@@ -236,6 +238,29 @@ chrome.runtime.onMessage.addListener((request, sender, response)=>{
   }
 });
 
+socket.on('authentication', (data)=>{
+  let success = data.__chrome_unique_id === storage.__chrome_unique_id && data.authenticationSuccessful;
+  chrome.runtime.sendMessage({
+    type: 'ManagePage',
+    success: success
+  });
+});
+
+
+/*
+* Deleting a saved password
+* =========================
+*/
+chrome.runtime.onMessage.addListener((request, sender, response)=>{
+  if(request.type === 'delete-credentials'){
+    socket.emit('delete-credentials', {
+      chromeId: __storage.__chrome_unique_id,
+      fcm: __storage.__phone_fcm_id,
+      url: request.url
+    });
+  }
+});
+
 
 /*
 * Installation Scripts
@@ -260,7 +285,6 @@ chrome.runtime.onInstalled.addListener(()=>{
 * TODO
 * ====
 * Setting Page:
-*   -> Authentication to open
 *   -> Delete Option
 *   -> Add Option
 */
