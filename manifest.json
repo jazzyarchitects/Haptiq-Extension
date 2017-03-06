@@ -30,7 +30,7 @@
       "http://*/*",
       "https://*/*"
     ],
-    "js": ["content-scripts/dom-interfacer.js"]
+    "js": [/*"content-scripts/dom-interfacer.js", */"content-scripts/browser-authentication.js"]
   }],
   "icons": {
       "16": "images/unauthenticated16.png",
@@ -50,6 +50,8 @@
     "static/*.png",
     "static/*.js",
     "static/*.css",
-    "static/*.html"
+    "static/*.html",
+    "styles/manage.css",
+    "images/ic_action_fingerprint.png"
   ]
 }

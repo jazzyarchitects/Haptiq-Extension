@@ -1,7 +1,9 @@
 "use strict";
 
 // let socket = io.connect("http://52.25.225.108");
-let socket = io.connect("",{
+// const SOCKET_URL = "http://localhost:3000";
+const SOCKET_URL = "http://jibinmathews.in";
+let socket = io.connect(SOCKET_URL,{
   // TODO:  Remove this in production
   reconnection : false
 });
@@ -15,6 +17,8 @@ let __storage = undefined;
 let secret = {};
 let QRPopup = undefined;
 
+
+let browserAuthenticated = false;
 
 
 /*
@@ -75,6 +79,9 @@ socket.on('join-with', (data)=>{
   });
 });
 
+socket.on('disconnect', function(){
+  socket.connect(SOCKET_URL);
+})
 
 /*
 *  Pairing Phone and Chrome Extension
@@ -272,6 +279,36 @@ chrome.runtime.onInstalled.addListener(()=>{
   // chrome.tabs.create({url: newURL});
 });
 
+/*
+* Authentication for browser
+*/
+socket.on('browser-authentication', (data)=>{
+  // console.log("Chrome Authentication: "+JSON.stringify(data));
+  if(data.authentication === browserAuthenticated){
+    return; 
+  }
+  browserAuthenticated = data.authentication;
+  refresh();
+});
+
+function refresh(){
+  chrome.tabs.query({currentWindow: true}, (tabs)=>{
+    for(let tab of tabs){
+      console.log(tab);
+      if(tab.url.indexOf("chrome://")===-1)
+        chrome.tabs.executeScript(tab.id, {code: 'window.location.reload()'});
+    }
+  });
+}
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
+  if(request.type === 'browser-authentication'){
+    sendResponse({authentication: browserAuthenticated});
+  }
+});
+
+// browser-authentication
+//{"authentication": true}
 
 // setInterval(()=>{
 //   chrome.runtime.sendMessage({
@@ -285,6 +322,5 @@ chrome.runtime.onInstalled.addListener(()=>{
 * TODO
 * ====
 * Setting Page:
-*   -> Delete Option
 *   -> Add Option
 */
